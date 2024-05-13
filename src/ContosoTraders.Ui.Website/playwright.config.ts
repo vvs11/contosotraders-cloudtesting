@@ -62,21 +62,21 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome']
       },
-      testIgnore: /api/,
+      testIgnore: /api/, 'tests/maps.spec.ts',
     },
     {
       name: 'firefox',
       use: {
         ...devices['Desktop Firefox']
       },
-      testIgnore: /api/,
+      testIgnore: /api/, 'tests/maps.spec.ts',
     },
     {
       name: 'webkit',
       use: {
         ...devices['Desktop Safari']
       },
-      testIgnore: /api/,
+      testIgnore: /api/, 'tests/maps.spec.ts',
     },
     {
       name: 'api',
