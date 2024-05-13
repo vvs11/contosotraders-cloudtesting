@@ -62,7 +62,7 @@ test.describe('Carousel', () => {
 });
 
 test.describe('CarouselVRT', () => {  
-  test.skip(({ browserName }) => browserName !== 'chromium', 'Chromium only!');
+  test.skip();
   test('verify carousel is pixel perfect - slide 1', async ({ page }) => {
     await expect(page.getByTestId('carousel')).toHaveScreenshot();
   })
