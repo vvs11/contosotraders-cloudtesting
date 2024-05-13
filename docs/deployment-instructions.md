@@ -112,6 +112,39 @@ Manually create an Azure Cognitive Service resource in your subscription tempora
     | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
     | `DEPLOYPRIVATEENDPOINTS`           | `true`
 
+
+2. Set up Microsoft Playwright Testing workspace
+    
+    To run Playwright tests using Playwright Testing service in the deployment workflow, you need to set up the service workspace and repo secrets.
+    
+    1. [Create a Playwright Testing workspace](https://learn.microsoft.com/en-us/azure/playwright-testing/quickstart-run-end-to-end-tests?tabs=playwrightcli#create-a-workspace)  
+    2. [Create an access token for service authentication](https://learn.microsoft.com/en-us/azure/playwright-testing/quickstart-run-end-to-end-tests?tabs=playwrightcli#create-an-access-token-for-service-authentication). Copy the token value. You will not see it again. 
+    3. [Configure the region endpoint](https://learn.microsoft.com/en-us/azure/playwright-testing/quickstart-run-end-to-end-tests?tabs=playwrightcli#configure-the-service-region-endpoint) and copy the URL that you get. 
+    4.  Store the access token in a CI workflow secret to avoid specifying the token in clear text in the workflow definition:
+    
+        1. Go to your GitHub repository, and select **Settings** > **Secrets and variables** > **Actions**.
+        1. Select **New repository secret**.
+        1. Enter the secret details, and then select **Add secret** to create the CI/CD secret.
+        
+            | Parameter | Value |
+            | ----------- | ------------ |
+            | **Name** | *PLAYWRIGHT_SERVICE_ACCESS_TOKEN* |  
+            | **Value** | Paste the workspace access token you copied previously. |
+        
+        1. Select **OK** to create the workflow secret.
+
+    5. Store the region endpoint in a CI workflow secret
+
+        The endpoint URL matches the Azure region that you selected when creating the workspace.
+
+        1. Go to your GitHub repository, and select **Settings** > **Secrets and variables** > **Actions**.
+        1. Select **New repository secret**.
+        1. Enter the secret details, and then select **Add secret** to create the CI/CD secret.
+
+            | Secret name | Value |
+            | ----------- | ------------ |
+            | *PLAYWRIGHT_SERVICE_URL* | Paste the endpoint URL you copied previously. |
+
 ### Deploy the Application
 
 1. Go to your forked repo's `Actions` tab, selecting the `contoso-traders-cloud-testing` workflow, and click on the `Run workflow` button.
@@ -153,11 +186,13 @@ Once you are done deploying, testing, exploring, you should delete the `contoso-
 
 The `contoso-traders-aks-nodes-rg{SUFFIX}` will be automatically deleted as part of the AKS cluster deletion.
 
+To delete Microsoft Playwright Testing workspace, you need to search for the workspace you created in the step and delete the workspace and resource-group associated with it. By default, the name of resource group is <Workspace_Name>-rg
 ## Cost Considerations
 
 A quick note on costs considerations when you deploy the application to your Azure subscription:
 
 1. Azure Load Testing ([pricing details](https://azure.microsoft.com/pricing/details/load-testing/)): The number of virtual users and duration of the test are the key factors that determine the cost of the test. In this demo, the load tests are configured to use 5 virtual users and the test is set to run for 3 mins.
+2. Microsoft Playwright Testing ([pricing details](https://aka.ms/mpt/pricing)): The billing minutes consumed and the operating system used to run tests are the key factors that determine the cost. In this demo, the service will consume ~15 minutes of browser minutes on Linux operating system. 
 2. Azure Kubernetes Service ([pricing details](https://azure.microsoft.com/pricing/details/kubernetes-service/)): The number of nodes and the number of hours that the cluster is running are the key factors that determine the cost of the cluster. In this demo, the cluster is configured to use 1 node (powered by vm scale sets) and the cluster is set to run 24x7 (you can manually stop the cluster when not in use). Because of a [limitation in the AKS bicep schema](https://github.com/Azure/bicep/issues/6974), the AKS cluster has to use premium SSD storage disks.
 3. Azure Container Apps ([pricing details](https://azure.microsoft.com/pricing/details/container-apps/)): Each instance has 0.5 vCPU and 1.0 GiB of memory. In this demo, the container app is configured to use 1 instance, but can autoscale out to max 3 instances under load.
 4. Azure Virtual Machines ([pricing details](https://azure.microsoft.com/pricing/details/virtual-machines/windows/)): The jumpbox VM uses the `Standard_D2s_v3` VM size, which has 2 vCPU and 8 GiB of memory. The jumpbox VMs are schedule to auto-shutdown at 1900 UTC daily. You can also manually stop & deallocate the VM when not in use.
